@@ -1,0 +1,879 @@
+// v7 hardening
+function onReady(fn){
+  if (document.readyState !== 'loading') fn();
+  else document.addEventListener('DOMContentLoaded', fn);
+}
+
+/* ========= Helpers ========= */
+const qs = (s, el = document) => el.querySelector(s);
+const qsa = (s, el = document) => [...el.querySelectorAll(s)];
+const money = (n) => `$${Number(n).toLocaleString()}`;
+
+/* ========= Data ========= */
+const PRODUCTS = [
+  {
+    id: "iphone15pro",
+    name: "iPhone 15 Pro",
+    category: "phones",
+    price: 999,
+    oldPrice: 1199,
+    rating: 4.7,
+    reviews: 1250,
+    desc: "256GB • 5G • Pro Camera • Titanium build",
+    img: "assets/img/iphone15pro.jpg",
+    thumb: "assets/img/iphone15pro.jpg",
+    tags: ["Hot", "-20%"],
+    specs: ["6.1\" OLED Display", "A17 Pro Chip", "48MP Pro Camera", "USB‑C Fast Charging"]
+  },
+  {
+    id: "macbookair",
+    name: "MacBook Air",
+    category: "laptops",
+    price: 899,
+    oldPrice: 999,
+    rating: 5,
+    reviews: 980,
+    desc: "M‑series • Ultra light • All‑day battery",
+    img: "assets/img/macbookair.jpg",
+    thumb: "assets/img/macbookair.jpg",
+    tags: ["Sale", "-17%"],
+    specs: ["13\" Retina Display", "M‑series CPU", "8GB–16GB RAM Options", "Silent fanless design"]
+  },
+  {
+    id: "headsetnc",
+    name: "Noise Cancelling Headset",
+    category: "accessories",
+    price: 149,
+    oldPrice: 189,
+    rating: 4.2,
+    reviews: 620,
+    desc: "Studio sound • Deep bass • ANC",
+    img: "assets/img/headsetnc.jpg",
+    thumb: "assets/img/headsetnc.jpg",
+    tags: ["Hot", "-22%"],
+    specs: ["Active Noise Cancelling", "Bluetooth 5.x", "40h Battery", "Comfort-fit earcups"]
+  },
+  {
+    id: "smartwatch",
+    name: "Smart Watch",
+    category: "smart",
+    price: 199,
+    oldPrice: 249,
+    rating: 3.8,
+    reviews: 410,
+    desc: "Fitness • Sleep • Calls • Waterproof",
+    img: "assets/img/smartwatch.jpg",
+    thumb: "assets/img/smartwatch.jpg",
+    tags: ["Sale", "-19%"],
+    specs: ["Heart rate monitoring", "Sleep tracking", "Bluetooth calling", "Water resistant"]
+  },
+  {
+    id: "pixel8",
+    name: "Google Pixel 8",
+    category: "phones",
+    price: 749,
+    oldPrice: 849,
+    rating: 4.5,
+    reviews: 540,
+    desc: "AI camera • Smooth display • Clean Android",
+    img: "assets/img/pixel8.jpg",
+    thumb: "assets/img/pixel8.jpg",
+    tags: ["Deal", "-12%"],
+    specs: ["120Hz OLED", "AI photo tools", "Fast charging", "Great low-light shots"]
+  },
+  {
+    id: "galaxyultra",
+    name: "Samsung Ultra",
+    category: "phones",
+    price: 999,
+    oldPrice: 1099,
+    rating: 4.6,
+    reviews: 880,
+    desc: "AMOLED • Camera beast • Premium build",
+    img: "assets/img/galaxyultra.jpg",
+    thumb: "assets/img/galaxyultra.jpg",
+    tags: ["Hot", "-9%"],
+    specs: ["AMOLED display", "Pro-grade camera", "Fast charging", "High performance chipset"]
+  },
+  {
+    id: "macbookpro",
+    name: "MacBook Pro",
+    category: "laptops",
+    price: 1499,
+    oldPrice: 1799,
+    rating: 4.9,
+    reviews: 670,
+    desc: "Creator powerhouse • Pro display • Fast render",
+    img: "assets/img/macbookpro.jpg",
+    thumb: "assets/img/macbookpro.jpg",
+    tags: ["Sale", "-16%"],
+    specs: ["ProMotion display", "Powerful CPU/GPU", "Great thermals", "All-day battery"]
+  }
+];
+
+/* ========= Storage (cart) ========= */
+const CART_KEY = "lilin_cart_v1";
+function loadCart(){
+  try{ return JSON.parse(localStorage.getItem(CART_KEY)) || []; }catch{ return []; }
+}
+function saveCart(cart){ localStorage.setItem(CART_KEY, JSON.stringify(cart)); }
+
+function cartCount(cart){ return cart.reduce((s,it)=>s+it.qty,0); }
+function cartTotal(cart){ return cart.reduce((s,it)=>s + it.price*it.qty,0); }
+
+/* ========= Common: Year ========= */
+const yearEl = qs("#year");
+if (yearEl) yearEl.textContent = new Date().getFullYear();
+
+/* ========= AOS ========= */
+if (window.AOS) {
+  AOS.init({ duration: 900, once: true, offset: 80 });
+}
+
+/* ========= VanillaTilt ========= */
+if (window.VanillaTilt) {
+  VanillaTilt.init(qsa(".tilt"), { max: 8, speed: 700, glare: true, "max-glare": 0.25, scale: 1.02 });
+}
+
+/* ========= GLightbox ========= */
+if (window.GLightbox) {
+  GLightbox({ selector: ".glightbox" });
+}
+
+/* ========= Swiper (Home) ========= */
+if (window.Swiper && qs(".heroSwiper")) {
+  const heroSwiper = new Swiper(".heroSwiper", { loop: true, speed: 900, autoplay: { delay: 2800, disableOnInteraction: false } });
+  const prev = qs("#prevSlide"); const next = qs("#nextSlide");
+  if (prev) prev.addEventListener("click", () => heroSwiper.slidePrev());
+  if (next) next.addEventListener("click", () => heroSwiper.slideNext());
+}
+
+/* ========= CountUp ========= */
+function initCountUps(){
+  if (!window.countUp) return;
+  const CountUp = window.countUp.CountUp;
+  qsa("[data-countup]").forEach((el) => {
+    const endVal = Number(el.getAttribute("data-countup"));
+    const cu = new CountUp(el, endVal, { duration: 1.6, separator: "," });
+    if (!cu.error) cu.start();
+  });
+}
+initCountUps();
+
+/* ========= Countdown (Home) ========= */
+(function countdownInit(){
+  if (!qs("#cdDays")) return;
+  const end = new Date(Date.now() + 48 * 60 * 60 * 1000);
+  const pad2 = (n)=>String(n).padStart(2,"0");
+  function tick(){
+    const diff = Math.max(0, end - new Date());
+    const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+    const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
+    const mins = Math.floor((diff / (1000 * 60)) % 60);
+    const secs = Math.floor((diff / 1000) % 60);
+    qs("#cdDays").textContent = pad2(days);
+    qs("#cdHours").textContent = pad2(hours);
+    qs("#cdMins").textContent = pad2(mins);
+    qs("#cdSecs").textContent = pad2(secs);
+  }
+  tick(); setInterval(tick, 1000);
+})();
+
+/* ========= Menu Drawer ========= */
+function openDrawer(drawer){
+  if (!drawer) return;
+  drawer.classList.add("is-open");
+  drawer.setAttribute("aria-hidden","false");
+  document.body.style.overflow = "hidden";
+}
+function closeDrawer(drawer){
+  if (!drawer) return;
+  drawer.classList.remove("is-open");
+  drawer.setAttribute("aria-hidden","true");
+  document.body.style.overflow = "";
+}
+const menuDrawer = qs("#menuDrawer");
+const openMenuBtn = qs("#openMenu");
+const openMenuBtn2 = qs("#openMenu2");
+const closeMenuBtn = qs("#closeMenu");
+const menuBackdrop = qs("#menuBackdrop");
+if (openMenuBtn) openMenuBtn.addEventListener("click", ()=>openDrawer(menuDrawer));
+if (openMenuBtn2) openMenuBtn2.addEventListener("click", ()=>openDrawer(menuDrawer));
+if (closeMenuBtn) closeMenuBtn.addEventListener("click", ()=>closeDrawer(menuDrawer));
+if (menuBackdrop) menuBackdrop.addEventListener("click", ()=>closeDrawer(menuDrawer));
+qsa(".drawer__link", menuDrawer || document).forEach(a => a.addEventListener("click", ()=>closeDrawer(menuDrawer)));
+
+/* ========= Cart Drawer (optional on pages) ========= */
+const cartDrawer = qs("#cartDrawer");
+const openCartBtn = qs("#openCart");
+const closeCartBtn = qs("#closeCart");
+const cartBackdrop = qs("#cartBackdrop");
+if (openCartBtn) openCartBtn.addEventListener("click", ()=>openDrawer(cartDrawer));
+if (closeCartBtn) closeCartBtn.addEventListener("click", ()=>closeDrawer(cartDrawer));
+if (cartBackdrop) cartBackdrop.addEventListener("click", ()=>closeDrawer(cartDrawer));
+
+/* ========= Cart UI (drawer + pages) ========= */
+function setCartBadge(){
+  const cart = loadCart();
+  const badge = qs("#cartCount");
+  if (badge) badge.textContent = cartCount(cart);
+}
+setCartBadge();
+
+function addToCart(productId, qty=1){
+  const cart = loadCart();
+  const p = PRODUCTS.find(x=>x.id===productId);
+  if (!p) return;
+  const found = cart.find(x=>x.id===productId);
+  if (found) found.qty += qty;
+  else cart.push({ id: p.id, name: p.name, price: p.price, qty, thumb: p.thumb });
+  saveCart(cart);
+  setCartBadge();
+  try{ updateCartBadge(); }catch(e){}
+}
+
+function renderCartDrawer(){
+  const cartItems = qs("#cartItems");
+  const totalEl = qs("#cartTotal");
+  if (!cartItems || !totalEl) return;
+  const cart = loadCart();
+  cartItems.innerHTML = "";
+  if (!cart.length){
+    cartItems.innerHTML = `<p class="muted">Your cart is empty. Add some deals!</p>`;
+    totalEl.textContent = "$0";
+    return;
+  }
+  cart.forEach((it, idx)=>{
+    const row = document.createElement("div");
+    row.className="cartItem";
+    row.innerHTML = `
+      <div>
+        <strong>${it.name}</strong><br/>
+        <small>${money(it.price)} • Qty: ${it.qty}</small>
+      </div>
+      <div style="display:flex; gap:8px; align-items:center;">
+        <button class="icon-btn icon-btn--soft" data-dec="${idx}" aria-label="Decrease"><i class="ri-subtract-line"></i></button>
+        <button class="icon-btn icon-btn--soft" data-inc="${idx}" aria-label="Increase"><i class="ri-add-line"></i></button>
+        <button class="icon-btn" data-del="${idx}" aria-label="Remove"><i class="ri-delete-bin-6-line"></i></button>
+      </div>
+    `;
+    cartItems.appendChild(row);
+  });
+  const total = cartTotal(cart);
+  totalEl.textContent = money(total);
+
+  qsa("[data-inc]").forEach(b => b.onclick = () => { const c=loadCart(); c[b.dataset.inc].qty++; saveCart(c); setCartBadge(); renderCartDrawer(); renderCartPage(); renderCheckoutSummary(); });
+  qsa("[data-dec]").forEach(b => b.onclick = () => {
+    const c=loadCart(); const i=Number(b.dataset.dec);
+    c[i].qty = Math.max(1, c[i].qty-1);
+    saveCart(c); setCartBadge(); renderCartDrawer(); renderCartPage(); renderCheckoutSummary();
+  });
+  qsa("[data-del]").forEach(b => b.onclick = () => {
+    const c=loadCart(); c.splice(Number(b.dataset.del),1);
+    saveCart(c); setCartBadge(); renderCartDrawer(); renderCartPage(); renderCheckoutSummary();
+  });
+  try{ updateCartBadge(); }catch(e){}
+}
+renderCartDrawer();
+
+/* ========= Live Chat Widget (UI demo) ========= */
+const chat = qs("#chat");
+const fabChat = qs("#fabChat");
+const openChatBtn = qs("#openChat");
+const openChatBtn2 = qs("#openChat2");
+const closeChatBtn2 = qs("#closeChat");
+const chatForm = qs("#chatForm");
+const chatInput = qs("#chatInput");
+const chatBody = qs("#chatBody");
+
+function openChat(){
+  if (!chat) return;
+  chat.classList.add("is-open");
+  chat.setAttribute("aria-hidden", "false");
+  if (chatInput) chatInput.focus();
+}
+function closeChat(){
+  if (!chat) return;
+  chat.classList.remove("is-open");
+  chat.setAttribute("aria-hidden", "true");
+}
+if (fabChat) fabChat.addEventListener("click", openChat);
+if (openChatBtn) openChatBtn.addEventListener("click", openChat);
+if (openChatBtn2) openChatBtn2.addEventListener("click", openChat);
+if (closeChatBtn2) closeChatBtn2.addEventListener("click", closeChat);
+
+function pickBotReply(text){
+  const t = text.toLowerCase();
+  if (t.includes("deliver") || t.includes("delivery")) return "Yes ✅ We deliver fast. Share your location and we’ll confirm shipping time.";
+  if (t.includes("laptop")) return "For design/work: MacBook Pro or high-performance Windows (16GB+ RAM). What’s your budget?";
+  if (t.includes("phone")) return "Do you want camera-focused, gaming, or battery life? I can recommend the best options.";
+  if (t.includes("price")) return "Tell me the product name and your budget. I’ll suggest the best deal today.";
+  return "Got it ✅ Please share the product you want and your budget so I can assist better.";
+}
+if (chatForm) {
+  chatForm.addEventListener("submit", (e)=>{
+    e.preventDefault();
+    const text = (chatInput?.value || "").trim();
+    if (!text) return;
+    const mine = document.createElement("div");
+    mine.className="msg msg--me";
+    mine.textContent=text;
+    chatBody.appendChild(mine);
+    chatInput.value="";
+    chatBody.scrollTop = chatBody.scrollHeight;
+
+    setTimeout(()=>{
+      const bot = document.createElement("div");
+      bot.className="msg msg--bot";
+      bot.textContent=pickBotReply(text);
+      chatBody.appendChild(bot);
+      chatBody.scrollTop = chatBody.scrollHeight;
+    }, 650);
+  });
+}
+
+/* ========= Smooth scroll (only same page anchors) ========= */
+qsa('a[href^="#"]').forEach(a => {
+  a.addEventListener("click", (e) => {
+    const id = a.getAttribute("href");
+    const target = qs(id);
+    if (!target) return;
+    e.preventDefault();
+    target.scrollIntoView({ behavior: "smooth", block: "start" });
+  });
+});
+
+/* ========= Templates ========= */
+function starsHTML(rating){
+  const full = Math.floor(rating);
+  const half = rating - full >= 0.5 ? 1 : 0;
+  const empty = 5 - full - half;
+  return `
+    ${'<i class="ri-star-fill"></i>'.repeat(full)}
+    ${half ? '<i class="ri-star-half-fill"></i>' : ''}
+    ${'<i class="ri-star-line"></i>'.repeat(empty)}
+  `;
+}
+
+function productCardHTML(p){
+  const disc = p.oldPrice ? Math.round(100 - (p.price / p.oldPrice)*100) : 0;
+  return `
+  <article class="pcard" data-cat="${p.category}">
+    <div class="pimg">
+      <img src="${p.thumb}" alt="${p.name}" />
+    </div>
+    <div class="pbody">
+      <h3>${p.name}</h3>
+      <p class="desc">${p.desc}</p>
+      <div class="stars" aria-label="Rating ${p.rating} out of 5">${starsHTML(p.rating)}</div>
+      <div class="price">
+        <strong>${money(p.price)}</strong>
+        ${p.oldPrice ? `<span>${money(p.oldPrice)}</span>` : ``}
+        ${disc ? `<span style="margin-left:auto;color:var(--danger);font-weight:900">-${disc}%</span>` : ``}
+      </div>
+      <div class="pactions">
+        <a class="smallbtn" href="product.html?id=${encodeURIComponent(p.id)}">View</a>
+        <button class="smallbtn smallbtn--brand addToCartBtn" data-id="${p.id}">Add</button>
+      </div>
+    </div>
+  </article>`;
+}
+
+/* ========= Page: Shop ========= */
+function renderShopPage(){
+  const grid = qs("#shopGrid");
+  if (!grid) return;
+
+  const category = qs("#categorySelect");
+  // Apply preferred category (from menu quick links)
+  const pref = localStorage.getItem("lilin_pref_cat");
+  if (pref && category) { category.value = pref; localStorage.removeItem("lilin_pref_cat"); }
+
+  const sort = qs("#sortSelect");
+  const search = qs("#shopSearch");
+
+  function getFiltered(){
+    let list = [...PRODUCTS];
+    const cat = category?.value || "all";
+    const q = (search?.value || "").trim().toLowerCase();
+
+    if (cat !== "all") list = list.filter(p=>p.category===cat);
+    if (q) list = list.filter(p=> p.name.toLowerCase().includes(q) || p.desc.toLowerCase().includes(q));
+
+    const s = sort?.value || "popular";
+    if (s === "price-asc") list.sort((a,b)=>a.price-b.price);
+    if (s === "price-desc") list.sort((a,b)=>b.price-a.price);
+    if (s === "rating") list.sort((a,b)=>b.rating-a.rating);
+    return list;
+  }
+
+  function paint(){
+    const list = getFiltered();
+    grid.innerHTML = list.map((p,i)=>productCardHTML(p, (i%6)*40)).join("");
+    // Re-init tilt on new nodes
+    if (window.VanillaTilt) VanillaTilt.init(qsa(".tilt"), { max: 8, speed: 700, glare: true, "max-glare": 0.25, scale: 1.02 });
+    if (window.GLightbox) GLightbox({ selector: ".glightbox" });
+    if (window.AOS) AOS.refresh();
+
+    qsa(".addToCartBtn").forEach(btn=>{
+      btn.addEventListener("click", ()=>{
+        addToCart(btn.dataset.id, 1);
+        renderCartDrawer();
+        if (cartDrawer) openDrawer(cartDrawer);
+      });
+    });
+  }
+
+  [category, sort].forEach(el => el?.addEventListener("change", paint));
+  search?.addEventListener("input", ()=>{
+    // small debounce
+    clearTimeout(window.__shop_t);
+    window.__shop_t = setTimeout(paint, 120);
+  });
+
+  paint();
+}
+renderShopPage();
+
+/* ========= Page: Product ========= */
+function renderProductPage(){
+  const mount = qs("#productMount");
+  if (!mount) return;
+
+  const params = new URLSearchParams(location.search);
+  const id = params.get("id");
+  const p = PRODUCTS.find(x=>x.id===id) || PRODUCTS[0];
+
+  mount.innerHTML = `
+  <div class="pwrap">
+    <div class="pmedia tilt" data-aos="fade-up">
+      <a class="glightbox" href="${p.img}" data-gallery="product">
+        <img src="${p.img}" alt="${p.name}">
+      </a>
+    </div>
+    <div class="pinfo" data-aos="fade-left">
+      <div class="breadcrumb"><a href="index.html">Home</a> / <a href="shop.html">Shop</a> / <span>${p.name}</span></div>
+      <h1>${p.name}</h1>
+      <p class="muted">${p.desc}</p>
+
+      <div class="pcard__meta">
+        <div class="stars">${starsHTML(p.rating)}</div>
+        <div class="muted">${p.rating} (${p.reviews} reviews)</div>
+      </div>
+
+      <div class="priceBig">
+        <strong>${money(p.price)}</strong>
+        ${p.oldPrice ? `<span>${money(p.oldPrice)}</span>` : ``}
+      </div>
+
+      <div class="pbadges">
+        <span class="badge2"><i class="ri-shield-check-line"></i> Secure Payments</span>
+        <span class="badge2"><i class="ri-truck-line"></i> Fast Delivery</span>
+        <span class="badge2"><i class="ri-refresh-line"></i> 30-day Returns</span>
+      </div>
+
+      <div class="qty">
+        <button class="icon-btn icon-btn--soft" id="qtyDec" aria-label="Decrease"><i class="ri-subtract-line"></i></button>
+        <div class="badge2" style="min-width:70px; text-align:center" id="qtyVal">1</div>
+        <button class="icon-btn icon-btn--soft" id="qtyInc" aria-label="Increase"><i class="ri-add-line"></i></button>
+      </div>
+
+      <div style="display:flex; gap:10px; flex-wrap:wrap">
+        <button class="btn btn--primary" id="addThis"><i class="ri-shopping-cart-2-line"></i> Add to Cart</button>
+        <a class="btn btn--glass" href="cart.html"><i class="ri-secure-payment-line"></i> Go to Cart</a>
+        <button class="btn btn--ghost" id="openChat2"><i class="ri-customer-service-2-line"></i> Live Chat</button>
+      </div>
+
+      <div class="specs">
+        <strong>Key Specifications</strong>
+        <ul>${p.specs.map(s=>`<li>${s}</li>`).join("")}</ul>
+      </div>
+    </div>
+  </div>
+  `;
+
+  if (window.GLightbox) GLightbox({ selector: ".glightbox" });
+  if (window.VanillaTilt) VanillaTilt.init(qsa(".tilt"), { max: 8, speed: 700, glare: true, "max-glare": 0.25, scale: 1.02 });
+
+  let qty = 1;
+  const qtyVal = qs("#qtyVal");
+  qs("#qtyDec").addEventListener("click", ()=>{ qty=Math.max(1, qty-1); qtyVal.textContent=qty; });
+  qs("#qtyInc").addEventListener("click", ()=>{ qty=Math.min(99, qty+1); qtyVal.textContent=qty; });
+  qs("#addThis").addEventListener("click", ()=>{
+    addToCart(p.id, qty);
+    renderCartDrawer();
+    if (cartDrawer) openDrawer(cartDrawer);
+  });
+}
+renderProductPage();
+
+/* ========= Page: Cart ========= */
+function renderCartPage(){
+  const table = qs("#cartTable");
+  const subtotalEl = qs("#cartSubtotal");
+  const totalEl = qs("#cartPageTotal");
+  const emptyEl = qs("#cartEmpty");
+  if (!table) return;
+
+  const cart = loadCart();
+  if (!cart.length){
+    table.innerHTML = "";
+    if (emptyEl) emptyEl.style.display = "block";
+    if (subtotalEl) subtotalEl.textContent = "$0";
+    if (totalEl) totalEl.textContent = "$0";
+    return;
+  }
+  if (emptyEl) emptyEl.style.display = "none";
+
+  table.innerHTML = cart.map((it, idx)=>`
+    <div class="cartRow" data-idx="${idx}">
+      <img src="${it.thumb}" alt="${it.name}">
+      <div class="meta">
+        <strong>${it.name}</strong>
+        <small>${money(it.price)} • Qty: <span class="q">${it.qty}</span></small>
+      </div>
+      <div class="actions">
+        <button class="icon-btn icon-btn--soft dec" aria-label="Decrease"><i class="ri-subtract-line"></i></button>
+        <button class="icon-btn icon-btn--soft inc" aria-label="Increase"><i class="ri-add-line"></i></button>
+        <button class="icon-btn del" aria-label="Remove"><i class="ri-delete-bin-6-line"></i></button>
+      </div>
+    </div>
+  `).join("");
+
+  const subtotal = cartTotal(cart);
+  const shipping = subtotal > 0 ? 15 : 0;
+  const total = subtotal + shipping;
+
+  if (subtotalEl) subtotalEl.textContent = money(subtotal);
+  if (qs("#cartShipping")) qs("#cartShipping").textContent = money(shipping);
+  if (totalEl) totalEl.textContent = money(total);
+
+  qsa(".cartRow").forEach(row=>{
+    const idx = Number(row.dataset.idx);
+    row.querySelector(".inc").addEventListener("click", ()=>{
+      const c=loadCart(); c[idx].qty++; saveCart(c); setCartBadge(); renderCartDrawer(); renderCartPage(); renderCheckoutSummary();
+    });
+    row.querySelector(".dec").addEventListener("click", ()=>{
+      const c=loadCart(); c[idx].qty=Math.max(1, c[idx].qty-1); saveCart(c); setCartBadge(); renderCartDrawer(); renderCartPage(); renderCheckoutSummary();
+    });
+    row.querySelector(".del").addEventListener("click", ()=>{
+      const c=loadCart(); c.splice(idx,1); saveCart(c); setCartBadge(); renderCartDrawer(); renderCartPage(); renderCheckoutSummary();
+    });
+  });
+}
+renderCartPage();
+
+/* ========= Page: Checkout ========= */
+function renderCheckoutSummary(){
+  const mount = qs("#checkoutSummary");
+  if (!mount) return;
+  const cart = loadCart();
+  if (!cart.length){
+    mount.innerHTML = `<p class="muted">Your cart is empty. <a href="shop.html"><u>Go to shop</u></a>.</p>`;
+    return;
+  }
+  const subtotal = cartTotal(cart);
+  const shipping = 15;
+  const total = subtotal + shipping;
+
+  mount.innerHTML = `
+    <div class="line"><span>Subtotal</span><strong>${money(subtotal)}</strong></div>
+    <div class="line"><span>Shipping</span><strong>${money(shipping)}</strong></div>
+    <div class="line" style="border-top:1px solid rgba(255,255,255,.08); padding-top:10px">
+      <span>Total</span><strong>${money(total)}</strong>
+    </div>
+    <small class="muted">Demo checkout UI. Integrate payment gateway on backend.</small>
+  `;
+
+  const totalEl = qs("#checkoutTotal");
+  if (totalEl) totalEl.textContent = money(total);
+}
+renderCheckoutSummary();
+
+const placeOrder = qs("#placeOrder");
+if (placeOrder) {
+  placeOrder.addEventListener("click", ()=>{
+    const cart = loadCart();
+    if (!cart.length){
+      alert("Your cart is empty.");
+      return;
+    }
+    // simple demo success
+    localStorage.removeItem(CART_KEY);
+    setCartBadge();
+    renderCartDrawer();
+    renderCartPage();
+    renderCheckoutSummary();
+    alert("Order placed successfully! ✅ (Demo)");
+    location.href = "index.html";
+  });
+}
+
+/* ========= Shop page mini filter chips (if exists) ========= */
+(function chipFilters(){
+  const chips = qsa(".chipbtn");
+  const grid = qs("#productGrid");
+  if (!chips.length || !grid) return;
+
+  chips.forEach(btn=>{
+    btn.addEventListener("click", ()=>{
+      chips.forEach(b=>b.classList.remove("is-active"));
+      btn.classList.add("is-active");
+      const cat=btn.dataset.chip;
+      qsa(".pcard", grid).forEach(c=>{
+        const show = (cat==="all") || (c.dataset.cat===cat);
+        c.style.display = show ? "" : "none";
+      });
+    });
+  });
+})();
+
+/* ========= Home: populate deal grid if present ========= */
+(function renderHomeDeals(){
+  const grid = qs("#productGrid");
+  if (!grid) return;
+
+  // pick 4 first products
+  const list = PRODUCTS.slice(0,4);
+  grid.innerHTML = list.map((p,i)=>productCardHTML(p, i*40)).join("");
+  if (window.VanillaTilt) VanillaTilt.init(qsa(".tilt"), { max: 8, speed: 700, glare: true, "max-glare": 0.25, scale: 1.02 });
+  if (window.GLightbox) GLightbox({ selector: ".glightbox" });
+  if (window.AOS) AOS.refresh();
+
+  qsa(".addToCartBtn").forEach(btn=>{
+    btn.addEventListener("click", ()=>{
+      addToCart(btn.dataset.id, 1);
+      renderCartDrawer();
+      if (cartDrawer) openDrawer(cartDrawer);
+    });
+  });
+})();
+
+/* ========= Active nav highlighting ========= */
+(function activeNav(){
+  const path = location.pathname.split("/").pop() || "index.html";
+  qsa('[data-nav]').forEach(a=>{
+    if (a.getAttribute("href") === path) a.classList.add("is-active");
+  });
+})();
+
+
+/* ========= Mobile bottom bar controls ========= */
+const openMenuMobile = qs("#openMenuMobile");
+const openCartMobile = qs("#openCartMobile");
+const openChatMobile = qs("#openChatMobile");
+if (openMenuMobile) openMenuMobile.addEventListener("click", ()=>openDrawer(menuDrawer));
+if (openCartMobile) openCartMobile.addEventListener("click", ()=>openDrawer(cartDrawer));
+if (openChatMobile) openChatMobile.addEventListener("click", openChat);
+
+/* ========= Home rows ========= */
+(function renderHomeRows(){
+  const row1 = qs("#homeRow1");
+  const row2 = qs("#homeRow2");
+  if (!row1 && !row2) return;
+  const best = PRODUCTS.slice(0,5);
+  const deals = PRODUCTS.slice(2,7);
+  if (row1) row1.innerHTML = best.map(productCardHTML).join("");
+  if (row2) row2.innerHTML = deals.map(productCardHTML).join("");
+  qsa(".addToCartBtn").forEach(btn=>{
+    btn.addEventListener("click", ()=>{
+      addToCart(btn.dataset.id, 1);
+      renderCartDrawer();
+      if (cartDrawer) openDrawer(cartDrawer);
+    });
+  });
+})();
+
+
+/* ========= UI: Toast ========= */
+function ensureToast(){
+  let t = document.querySelector(".toast");
+  if (!t){
+    t = document.createElement("div");
+    t.className = "toast";
+    t.innerHTML = `<i class="ri-checkbox-circle-line"></i><span id="toastText">Done</span>`;
+    document.body.appendChild(t);
+  }
+  return t;
+}
+function toast(msg){
+  const t = ensureToast();
+  const tt = t.querySelector("#toastText");
+  if (tt) tt.textContent = msg;
+  t.classList.add("is-show");
+  clearTimeout(window.__toastTimer);
+  window.__toastTimer = setTimeout(()=>t.classList.remove("is-show"), 2200);
+}
+
+
+/* ========= Checkout via Live Chat ========= */
+function startCheckoutChat(){
+  openChat();
+  const cart = getCart();
+  if (!cart.length){
+    toast("Your cart is empty. Add items first.");
+    return;
+  }
+  const lines = cart.map(ci=>{
+    const p = PRODUCTS.find(x=>x.id===ci.id);
+    const name = p ? p.name : ci.id;
+    return `• ${name} x${ci.qty}`;
+  }).join("\n");
+  const msg = `Checkout\nCart Items:\n${lines}\n\nDelivery Address: \nPayment Method: `;
+  const input = qs("#chatInput");
+  if (input){
+    input.value = msg;
+    input.focus();
+  }
+  toast("Checkout message prepared in chat ✅");
+}
+
+const checkoutChatBtn = qs("#checkoutChatBtn");
+if (checkoutChatBtn) checkoutChatBtn.addEventListener("click", startCheckoutChat);
+
+document.addEventListener("click",(e)=>{
+  const el = e.target.closest("#cartDrawer a.btn--brand");
+  if (!el) return;
+  if (el.getAttribute("href")==="checkout.html"){
+    sessionStorage.setItem("lilin_checkout_chat","1");
+  }
+});
+
+(function autoCheckoutChat(){
+  if (!location.pathname.endsWith("checkout.html")) return;
+  const flag = sessionStorage.getItem("lilin_checkout_chat");
+  if (flag){
+    sessionStorage.removeItem("lilin_checkout_chat");
+    setTimeout(startCheckoutChat, 450);
+  }
+})();
+
+
+/* ========= v7: Drawer backdrops & ESC close ========= */
+function setupDrawerBackdrops(){
+  const menuBackdrop = qs("#menuBackdrop");
+  const cartBackdrop = qs("#cartBackdrop");
+  if (menuBackdrop) menuBackdrop.addEventListener("click", ()=>closeDrawer(menuDrawer));
+  if (cartBackdrop) cartBackdrop.addEventListener("click", ()=>closeDrawer(cartDrawer));
+  document.addEventListener("keydown",(e)=>{
+    if (e.key !== "Escape") return;
+    closeDrawer(menuDrawer);
+    closeDrawer(cartDrawer);
+    closeChat();
+  });
+}
+onReady(setupDrawerBackdrops);
+
+
+/* ========= v7: Bind header/mobile buttons (defensive) ========= */
+function bindHeaderButtonsV7(){
+  const openMenuBtn = qs("#openMenu");
+  const openMenuBtn2 = qs("#openMenu2");
+  const closeMenuBtn = qs("#closeMenu");
+  const openCartBtn = qs("#openCart");
+  const closeCartBtn = qs("#closeCart");
+
+  const openMenuMobile = qs("#openMenuMobile");
+  const openCartMobile = qs("#openCartMobile");
+  const openChatMobile = qs("#openChatMobile");
+
+  if (openMenuBtn) openMenuBtn.addEventListener("click", ()=>openDrawer(menuDrawer));
+  if (openMenuBtn2) openMenuBtn2.addEventListener("click", ()=>openDrawer(menuDrawer));
+  if (closeMenuBtn) closeMenuBtn.addEventListener("click", ()=>closeDrawer(menuDrawer));
+
+  if (openCartBtn) openCartBtn.addEventListener("click", ()=>{ renderCartDrawer(); openDrawer(cartDrawer); });
+  if (closeCartBtn) closeCartBtn.addEventListener("click", ()=>closeDrawer(cartDrawer));
+
+  if (openMenuMobile) openMenuMobile.addEventListener("click", ()=>openDrawer(menuDrawer));
+  if (openCartMobile) openCartMobile.addEventListener("click", ()=>{ renderCartDrawer(); openDrawer(cartDrawer); });
+  if (openChatMobile) openChatMobile.addEventListener("click", openChat);
+}
+onReady(bindHeaderButtonsV7);
+
+
+/* ========= v7: Cart badge ========= */
+function updateCartBadge(){
+  const badge = qs("#cartCount");
+  if (!badge) return;
+  const cart = getCart();
+  const count = cart.reduce((a,c)=>a + (c.qty||0), 0);
+  badge.textContent = String(count);
+}
+onReady(updateCartBadge);
+
+
+/* ========= v14: Jumia-style hero slider ========= */
+function initHeroSlider(){
+  const slidesEl = qs("#heroSlides");
+  const dotsEl = qs("#heroDots");
+  if (!slidesEl || !dotsEl) return;
+
+  const picks = (typeof PRODUCTS !== "undefined" && PRODUCTS.length) ? PRODUCTS.slice(0,5) : [];
+
+  const SLIDES = [
+    { title: "Mega Discounts on Smartphones", subtitle: "Save big on original phones & accessories — limited offers.", cta: "Shop Phones", href: "shop.html", art: picks[0]?.thumb, tag:"Top Deals" },
+    { title: "Work & Study Laptops", subtitle: "Smooth performance for design, coding and business tasks.", cta: "Shop Laptops", href: "shop.html", art: picks[1]?.thumb, tag:"Best Sellers" },
+    { title: "Audio & Wearables", subtitle: "Headphones, smart watches and more — premium sound & style.", cta: "Explore", href: "shop.html", art: picks[2]?.thumb, tag:"Trending" },
+    { title: "Smart Devices for Everyday Life", subtitle: "Upgrade your lifestyle with smart tech essentials.", cta: "Browse Smart", href: "shop.html", art: picks[3]?.thumb, tag:"New" },
+    { title: "Accessories & Power", subtitle: "Chargers, cables, power banks and extras — quality guaranteed.", cta: "Shop Accessories", href: "shop.html", art: picks[4]?.thumb, tag:"Hot" },
+  ];
+
+  slidesEl.innerHTML = SLIDES.map((s, idx)=>`
+    <article class="slide" aria-label="Slide ${idx+1}">
+      <div>
+        <span class="pill" style="background:#fff;border-color:var(--stroke)"><i class="ri-price-tag-3-line" style="color:var(--brand2)"></i> ${s.tag}</span>
+        <h2>${s.title}</h2>
+        <p>${s.subtitle}</p>
+        <div style="display:flex;gap:10px;flex-wrap:wrap">
+          <a class="btn btn--brand" href="${s.href}">${s.cta} <i class="ri-arrow-right-line"></i></a>
+          <button class="btn btn--ghost" type="button" onclick="document.getElementById('fabChat')?.click()">Ask on Live Chat</button>
+        </div>
+      </div>
+      <div class="slideArt">
+        <img src="${s.art || 'assets/img/logo.jpg'}" alt="${s.title}">
+      </div>
+    </article>
+  `).join("");
+
+  dotsEl.innerHTML = SLIDES.map((_,i)=>`<button class="dot ${i===0?'is-active':''}" aria-label="Go to slide ${i+1}" data-i="${i}"></button>`).join("");
+
+  let index = 0;
+  const total = SLIDES.length;
+  const prev = qs("#heroPrev");
+  const next = qs("#heroNext");
+
+  function render(){
+    slidesEl.style.transform = `translateX(${-index*100}%)`;
+    qsa("#heroDots .dot").forEach((d, i)=>d.classList.toggle("is-active", i===index));
+  }
+  function go(n){
+    index = (n + total) % total;
+    render();
+  }
+
+  let timer = null;
+  function start(){ stop(); timer = setInterval(()=>go(index+1), 5500); }
+  function stop(){ if (timer) clearInterval(timer); timer = null; }
+
+  if (prev) prev.addEventListener("click", ()=>{ go(index-1); start(); });
+  if (next) next.addEventListener("click", ()=>{ go(index+1); start(); });
+
+  dotsEl.addEventListener("click",(e)=>{
+    const btn = e.target.closest(".dot");
+    if (!btn) return;
+    go(parseInt(btn.dataset.i,10));
+    start();
+  });
+
+  const slider = slidesEl.closest(".slider");
+  if (slider){
+    slider.addEventListener("mouseenter", stop);
+    slider.addEventListener("mouseleave", start);
+    slider.addEventListener("touchstart", stop, {passive:true});
+    slider.addEventListener("touchend", start, {passive:true});
+  }
+
+  render();
+  start();
+}
+onReady(initHeroSlider);

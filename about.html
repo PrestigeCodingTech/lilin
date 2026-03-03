@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Lilin — About</title>
+  <meta name="theme-color" content="#0b1220">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/remixicon@4.3.0/fonts/remixicon.css"/>
+
+  <link rel="stylesheet" href="https://unpkg.com/aos@2.3.4/dist/aos.css" /><link rel="stylesheet" href="assets/css/style.css"/>
+</head><body>
+<div class="topstrip"><div class="container topstrip__inner">
+  <div class="socialrow" style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+    <span class="pill"><i class="ri-shield-check-line"></i> Secure Payments</span>
+    <span class="pill"><i class="ri-truck-line"></i> Fast Delivery</span>
+    <span class="pill"><i class="ri-customer-service-2-line"></i> 24/7 Support</span>
+  </div>
+  <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+    <a class="pill" href="mailto:lilincommunicationexercise@gmail.com"><i class="ri-mail-line"></i> Email</a>
+    
+  </div>
+</div></div>
+
+<header class="header">
+  <div class="container header__row">
+    <a class="brand" href="index.html">
+      <div class="brand__logo"><img src="assets/img/logo.jpg" alt="Lilin logo"></div>
+      <div><div class="brand__name">LILIN</div><div class="brand__tag">Communication Exercise</div></div>
+    </a>
+
+    <div class="searchbar" role="search">
+      <select aria-label="Search department"><option>All</option><option>Phones</option><option>Laptops</option><option>Accessories</option><option>Smart Devices</option></select>
+      <input type="search" placeholder="Search products, brands and categories…"/>
+      <button type="button" aria-label="Search"><i class="ri-search-2-line"></i></button>
+    </div>
+
+    <div class="actions">
+      <div class="location"><i class="ri-map-pin-2-line" style="font-size:1.3rem;color:var(--blue)"></i>
+        <div><small>Deliver to</small><strong>Shenyang, China</strong></div>
+      </div>
+      <button class="iconbtn" id="openMenu" aria-label="Open menu"><i class="ri-menu-2-line"></i></button>
+      <a class="action" href="checkout.html"><i class="ri-user-3-line"></i><div><small>Hello, Sign in</small><strong>Account</strong></div></a>
+      <a class="iconbtn" href="#" aria-label="Wishlist"><i class="ri-heart-3-line"></i></a>
+      <button class="iconbtn" id="openCart" aria-label="Cart"><i class="ri-shopping-cart-2-line"></i><span class="badge" id="cartCount">0</span></button>
+    </div>
+  </div>
+
+  <div class="navbar">
+    <div class="container navbar__inner">
+      <button class="navbtn" id="openMenu2"><i class="ri-menu-line"></i> All Categories</button>
+      <a class="navlink" href="shop.html">Shop</a>
+      <a class="navlink" href="shop.html">Today's Deals</a>
+      <a class="navlink" href="shop.html">Best Sellers</a>
+      <a class="navlink" href="about.html">About</a>
+      <a class="navlink" href="contact.html">Contact</a>
+      <button class="navcta" id="openChat"><i class="ri-chat-3-line"></i> Live Chat</button>
+    </div>
+  </div>
+
+  <aside class="drawer" id="menuDrawer" aria-hidden="true">
+    <div class="drawer__panel">
+      <div class="drawer__head"><strong>Menu</strong>
+        <button class="iconbtn" id="closeMenu" aria-label="Close menu"><i class="ri-close-line"></i></button>
+      </div>
+      <div class="drawer__body">
+        <a class="drawer__link" href="index.html">Home <i class="ri-arrow-right-s-line"></i></a>
+        <a class="drawer__link" href="shop.html">Shop <i class="ri-arrow-right-s-line"></i></a>
+        <a class="drawer__link" href="shop.html" onclick="localStorage.setItem('lilin_pref_cat','phones')">Smartphones <i class="ri-smartphone-line"></i></a>
+        <a class="drawer__link" href="shop.html" onclick="localStorage.setItem('lilin_pref_cat','laptops')">Laptops <i class="ri-macbook-line"></i></a>
+        <a class="drawer__link" href="shop.html" onclick="localStorage.setItem('lilin_pref_cat','accessories')">Accessories <i class="ri-headphone-line"></i></a>
+        <a class="drawer__link" href="shop.html" onclick="localStorage.setItem('lilin_pref_cat','smart')">Smart Devices <i class="ri-watch-line"></i></a>
+        <a class="drawer__link" href="cart.html">Cart <i class="ri-shopping-cart-2-line"></i></a>
+        <a class="drawer__link" href="checkout.html">Checkout <i class="ri-secure-payment-line"></i></a>
+        <a class="drawer__link" href="about.html">About <i class="ri-information-line"></i></a>
+        <a class="drawer__link" href="contact.html">Contact <i class="ri-phone-line"></i></a>
+      </div>
+    </div>
+    <div class="drawer__backdrop" id="menuBackdrop"></div>
+  </aside>
+</header>
+
+<main class="main">
+  <div class="container">
+    <section class="pagehero" data-aos="fade-up">
+      <div style="display:flex; gap:12px; align-items:center; flex-wrap:wrap">
+        <span class="pill" style="background:#fff; border-color:var(--stroke)"><i class="ri-award-line" style="color:var(--blue)"></i> Trusted Gadget Store</span>
+        <span class="pill" style="background:#fff; border-color:var(--stroke)"><i class="ri-shield-check-line" style="color:var(--green)"></i> Quality Guaranteed</span>
+        <span class="pill" style="background:#fff; border-color:var(--stroke)"><i class="ri-truck-line" style="color:var(--brand2)"></i> Fast Delivery</span>
+      </div>
+      <h1 style="margin-top:10px">About Lilin Communication Exercise</h1>
+      <p>
+        We’re a modern electronics gadgets store focused on original products, fair pricing, and a smooth customer experience.
+        From smartphones and laptops to accessories and smart devices, we help you buy confidently — with support available anytime via live chat.
+      </p>
+    </section>
+
+    <div class="kpiGrid" style="margin-top:14px">
+      <div class="kpi" data-aos="fade-up" data-aos-delay="60"><div class="num">100%</div><div class="lbl">Genuine products focus</div></div>
+      <div class="kpi" data-aos="fade-up" data-aos-delay="90"><div class="num">24/7</div><div class="lbl">Live chat support</div></div>
+      <div class="kpi" data-aos="fade-up" data-aos-delay="120"><div class="num">Fast</div><div class="lbl">Delivery & order confirmation</div></div>
+    </div>
+
+    <div class="grid2" style="margin-top:14px">
+      <section class="infoCards" data-aos="fade-up">
+        <div class="infoCard">
+          <strong><i class="ri-focus-3-line" style="color:var(--blue)"></i> Our Mission</strong>
+          <p>To make it easy for customers to buy reliable electronics gadgets with transparent pricing, fast support, and safe order confirmation through live chat.</p>
+        </div>
+        <div class="infoCard">
+          <strong><i class="ri-eye-2-line" style="color:var(--brand2)"></i> Our Vision</strong>
+          <p>To become a leading, customer-first electronics store recognized for quality, speed, and a premium shopping experience across devices.</p>
+        </div>
+        <div class="infoCard">
+          <strong><i class="ri-heart-3-line" style="color:#e11d48"></i> Our Values</strong>
+          <p><b>Integrity</b>, <b>Customer satisfaction</b>, <b>Quality assurance</b>, <b>Speed</b>, and <b>Continuous improvement</b>.</p>
+        </div>
+      </section>
+
+      
+    </div>
+  </div>
+</main>
+
+<footer class="footer">
+  <div class="container footer__grid">
+    <div>
+      <div class="brand">
+        <div class="brand__logo"><img src="assets/img/logo.jpg" alt="Lilin logo"></div>
+        <div><div class="brand__name" style="color:#fff">LILIN</div><div class="brand__tag">Communication Exercise</div></div>
+      </div>
+      <p class="muted">No. 43 Xiao Bei Guan Jie, Dadong District, Shenyang City, Liaoning Province, China</p>
+    </div>
+    <div><h4>Customer Service</h4><ul>
+      <li><a href="contact.html">Help Center</a></li><li><a href="contact.html">Returns & Refunds</a></li><li><a href="contact.html">Shipping & Delivery</a></li>
+    </ul></div>
+    <div><h4>Quick Links</h4><ul>
+      <li><a href="shop.html">Shop</a></li><li><a href="cart.html">Cart</a></li><li><a href="checkout.html">Checkout</a></li><li><a href="about.html">About</a></li><li><a href="contact.html">Contact</a></li>
+    </ul></div>
+    <div><h4>Newsletter</h4>
+      <form class="newsletter" onsubmit="event.preventDefault();alert('Subscribed! ✅ (Demo)');">
+        <input type="email" placeholder="Email address" required><button class="btn btn--brand" type="submit">Subscribe</button>
+      </form><small>Get exclusive deals and updates.</small>
+    </div>
+  </div>
+  <div class="container footer__bottom">
+    <small>© <span id="year"></span> Lilin Communication Exercise. All rights reserved.</small>
+    <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+      <a class="pill" href="#"><i class="ri-facebook-circle-line"></i></a>
+      <a class="pill" href="#"><i class="ri-instagram-line"></i></a>
+      <a class="pill" href="#"><i class="ri-whatsapp-line"></i></a>
+    </div>
+  </div>
+</footer>
+
+<aside class="drawer" id="cartDrawer" aria-hidden="true">
+  <div class="drawer__panel" style="left:auto;right:0;border-right:0;border-left:1px solid var(--stroke)">
+    <div class="drawer__head"><strong>Your Cart</strong><button class="iconbtn" id="closeCart" aria-label="Close cart"><i class="ri-close-line"></i></button></div>
+    <div class="drawer__body" id="cartItems"></div>
+    <div style="padding:14px;border-top:1px solid var(--stroke)">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px"><span>Total</span><strong id="cartTotal">$0</strong></div>
+      <a class="btn btn--brand" style="width:100%" href="checkout.html">Checkout via Chat <i class="ri-chat-3-line"></i></a>
+    </div>
+  </div>
+  <div class="drawer__backdrop" id="cartBackdrop"></div>
+</aside>
+
+<button class="fab" id="fabChat" aria-label="Open live chat"><i class="ri-chat-smile-3-line"></i></button>
+<section class="chat" id="chat" aria-hidden="true">
+  <div class="chat__head"><strong>Lilin Support</strong><button class="iconbtn" id="closeChat" aria-label="Close chat"><i class="ri-close-line"></i></button></div>
+  <div class="chat__body" id="chatBody">
+    <div class="msg">Hi! 👋 How can we help you today?</div>
+    <div class="msg">Try: “Recommend a laptop for design” or “Do you deliver to my location?”</div>
+  </div>
+  <form class="chat__form" id="chatForm">
+    <input type="text" id="chatInput" placeholder="Type your message…" autocomplete="off">
+    <button class="btn btn--brand" type="submit"><i class="ri-send-plane-2-line"></i></button>
+  </form>
+</section>
+
+<nav class="mobilebar" aria-label="Mobile navigation">
+  <div class="mobilebar__inner">
+    <a href="index.html" aria-label="Home"><i class="ri-home-5-line"></i></a>
+    <a href="shop.html" aria-label="Shop"><i class="ri-store-2-line"></i></a>
+    <button type="button" id="openMenuMobile" aria-label="Menu"><i class="ri-menu-2-line"></i></button>
+    <button type="button" id="openCartMobile" aria-label="Cart"><i class="ri-shopping-cart-2-line"></i></button>
+    <button type="button" id="openChatMobile" aria-label="Live chat"><i class="ri-chat-3-line"></i></button>
+  </div>
+</nav>
+
+<script src="https://unpkg.com/aos@2.3.4/dist/aos.js"></script>
+  <script src="assets/js/app.js"></script>
+</body></html>
